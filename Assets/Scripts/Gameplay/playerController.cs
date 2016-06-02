@@ -14,6 +14,9 @@ public class playerController : NetworkBehaviour
     GameObject body;
     Rigidbody rb;
 
+    [SyncVar]
+    Vector3 pos;
+
     BodyType bodyType;
     Camera cam;
 
@@ -31,6 +34,8 @@ public class playerController : NetworkBehaviour
             enabled = false;
             return;
         }
+
+        pos = new Vector3();
 
         CmdSpawnSphere();        
 
@@ -72,19 +77,21 @@ public class playerController : NetworkBehaviour
             {
                 case BodyType.sphere:
                     {
+                        pos = body.transform.position;
                         CmdDestroyBody();
                         CmdSpawnCube();
                         bodyType = BodyType.cube;
                         rb = null;
-                        break;
+                        return;
                     }
                 case BodyType.cube:
                     {
+                        pos = body.transform.position;
                         CmdDestroyBody();
                         CmdSpawnSphere();
                         bodyType = BodyType.sphere;
                         rb = null;
-                        break;
+                        return;
                     }
                 default:
                     break;
@@ -113,6 +120,8 @@ public class playerController : NetworkBehaviour
             default:
                 break;
         }
+
+        transform.position = body.transform.position;
     }
 
     [Command]
@@ -125,7 +134,7 @@ public class playerController : NetworkBehaviour
     [Command]
     void CmdSpawnSphere()
     {
-        var obj = (GameObject)Instantiate(playerSphere, transform.position, Quaternion.identity);
+        var obj = (GameObject)Instantiate(playerSphere, pos, Quaternion.identity);
 
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
@@ -135,7 +144,7 @@ public class playerController : NetworkBehaviour
     [Command]
     void CmdSpawnCube()
     {
-        var obj = (GameObject)Instantiate(playerCube, transform.position, Quaternion.identity);
+        var obj = (GameObject)Instantiate(playerCube, pos, Quaternion.identity);
 
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
