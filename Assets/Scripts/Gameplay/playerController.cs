@@ -78,10 +78,10 @@ public class playerController : NetworkBehaviour
             rb.position = pos;
         }
 
-        if (transform.position.y < 15)
+        if (rb.transform.position.y < -15)
         {
             rb.velocity = Vector3.zero;
-            transform.position = Vector3.zero;
+            rb.transform.position = Vector3.zero;
             return;
         }
 
