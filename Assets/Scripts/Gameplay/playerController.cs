@@ -5,6 +5,7 @@ using System.Collections;
 public class playerController : NetworkBehaviour
 {
     public GameObject playerSphere;
+    public GameObject playerCube;
     public float speed = 1;
     public float jumpenergy = 1;
     public float camspeed = 100;
@@ -12,6 +13,9 @@ public class playerController : NetworkBehaviour
     [SyncVar]
     GameObject body;
     Rigidbody rb;
+
+    [SyncVar]
+    Vector3 pos;
 
     BodyType bodyType;
     Camera cam;
@@ -30,6 +34,8 @@ public class playerController : NetworkBehaviour
             enabled = false;
             return;
         }
+
+        pos = new Vector3();
 
         CmdSpawnSphere();        
 
@@ -65,6 +71,33 @@ public class playerController : NetworkBehaviour
         if (!isLocalPlayer || body == null || rb == null)
             return;
 
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            switch (bodyType)
+            {
+                case BodyType.sphere:
+                    {
+                        pos = body.transform.position;
+                        CmdDestroyBody();
+                        CmdSpawnCube();
+                        bodyType = BodyType.cube;
+                        rb = null;
+                        return;
+                    }
+                case BodyType.cube:
+                    {
+                        pos = body.transform.position;
+                        CmdDestroyBody();
+                        CmdSpawnSphere();
+                        bodyType = BodyType.sphere;
+                        rb = null;
+                        return;
+                    }
+                default:
+                    break;
+            }
+        }
+
         switch (bodyType)
         {
             case BodyType.sphere:
@@ -87,12 +120,31 @@ public class playerController : NetworkBehaviour
             default:
                 break;
         }
+
+        transform.position = body.transform.position;
+    }
+
+    [Command]
+    void CmdDestroyBody()
+    {
+        GameObject obj = gameObject.GetComponent<playerController>().body;
+        NetworkServer.Destroy(obj);
     }
 
     [Command]
     void CmdSpawnSphere()
     {
-        var obj = (GameObject)Instantiate(playerSphere, transform.position, Quaternion.identity);
+        var obj = (GameObject)Instantiate(playerSphere, pos, Quaternion.identity);
+
+        NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
+
+        gameObject.GetComponent<playerController>().body = obj;
+    }
+
+    [Command]
+    void CmdSpawnCube()
+    {
+        var obj = (GameObject)Instantiate(playerCube, pos, Quaternion.identity);
 
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
