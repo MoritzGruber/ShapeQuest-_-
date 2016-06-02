@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 using System.Collections;
 
 public class UIManager : MonoBehaviour {
@@ -15,11 +16,8 @@ public class UIManager : MonoBehaviour {
     public string serverIP;
     public string serverPort;
 
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
+    NetworkManager netMan;
+
 	// Update is called once per frame
 	void Update ()
     {
@@ -27,17 +25,38 @@ public class UIManager : MonoBehaviour {
         playerColor = playerColorInput.text;
         serverIP    = serverIPInput.text;
         serverPort  = serverPortInput.text;
-
+        if (netMan == null)
+        {
+            netMan = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        }
     }
 
     public void JoinButtonClicked()
     {
+        if (serverIP == "")
+        {
+            serverIP = "localhost";
+        }
+        netMan.networkAddress = serverIP;
+        if (serverPort == "")
+        {
+            serverPort = "7777";
+        }
+        netMan.networkPort = int.Parse(serverPort);
 
+        netMan.StartClient();
     }
 
     public void HostButtonClicked()
     {
+        if (serverPort == "")
+        {
+            serverPort = "7777";
+        }
 
+        netMan.networkPort = int.Parse(serverPort);
+        
+        netMan.StartHost();
     }
 
 }
