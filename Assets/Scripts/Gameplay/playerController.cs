@@ -9,11 +9,12 @@ public class playerController : NetworkBehaviour
     public float jumpenergy = 1;
     public float camspeed = 100;
 
+    [SyncVar]
     GameObject body;
     Rigidbody rb;
+
     BodyType bodyType;
     Camera cam;
-    Vector3 offset;
 
     enum BodyType
     {
@@ -21,22 +22,22 @@ public class playerController : NetworkBehaviour
         cube
     }
 
-    // Use this for initialization
-    void Start()
+    public override void OnStartLocalPlayer()
     {
-        //if (body == null)
-        //{
-        Debug.Log("No Body found");
-        CmdCreatePlayerBody(playerSphere);
-        bodyType = BodyType.sphere;
-        //}
+        base.OnStartLocalPlayer();
+        if (!isLocalPlayer)
+        {
+            enabled = false;
+            return;
+        }
+
+        CmdSpawnSphere();        
 
         if (Camera.main != null)
             cam = Camera.main;
 
         cam.transform.position = new Vector3(0.0f, 0.0f, -7.5f);
         cam.transform.LookAt(transform);
-        offset = cam.transform.position - transform.position;
         cam.transform.SetParent(transform);
         transform.rotation = Quaternion.Euler(25, transform.localEulerAngles.y, transform.localEulerAngles.z);
     }
@@ -45,6 +46,8 @@ public class playerController : NetworkBehaviour
     {
         if (!isLocalPlayer || body == null)
             return;
+        if(rb == null)
+            rb = body.GetComponent<Rigidbody>();
 
         float x = transform.localEulerAngles.x + Input.GetAxis("Mouse Y") * camspeed * Time.deltaTime;
         float y = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * camspeed * Time.deltaTime;
@@ -59,7 +62,7 @@ public class playerController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!isLocalPlayer || body == null)
+        if (!isLocalPlayer || body == null || rb == null)
             return;
 
         switch (bodyType)
@@ -69,7 +72,7 @@ public class playerController : NetworkBehaviour
 
                     float moveUpwards = 0.0f;
 
-                    if (Input.GetKey(KeyCode.Space) && Physics.Raycast(transform.position, Vector3.down, 0.75f))
+                    if (Input.GetKey(KeyCode.Space) && Physics.Raycast(body.transform.position, Vector3.down, 0.75f))
                     {
                         moveUpwards = 50.0f * jumpenergy * Time.deltaTime;
                     }
@@ -87,15 +90,12 @@ public class playerController : NetworkBehaviour
     }
 
     [Command]
-    void CmdCreatePlayerBody(GameObject prefab)
+    void CmdSpawnSphere()
     {
-        Debug.Log("Creating Body");
-        body = (GameObject)Instantiate(prefab, transform.position, Quaternion.identity);
+        var obj = (GameObject)Instantiate(playerSphere, transform.position, Quaternion.identity);
 
-        ClientScene.RegisterPrefab(body);
+        NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
-        rb = body.GetComponent<Rigidbody>();
-
-        NetworkServer.Spawn(body);
+        gameObject.GetComponent<playerController>().body = obj;
     }
 }
