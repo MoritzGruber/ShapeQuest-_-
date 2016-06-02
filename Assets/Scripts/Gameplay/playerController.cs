@@ -50,10 +50,8 @@ public class playerController : NetworkBehaviour
 
     void Update()
     {
-        if (!isLocalPlayer || body == null)
+        if (!isLocalPlayer || body == null || rb == null)
             return;
-        if(rb == null)
-            rb = body.GetComponent<Rigidbody>();
 
         float x = transform.localEulerAngles.x + Input.GetAxis("Mouse Y") * camspeed * Time.deltaTime;
         float y = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * camspeed * Time.deltaTime;
@@ -68,8 +66,15 @@ public class playerController : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!isLocalPlayer || body == null || rb == null)
+        if (!isLocalPlayer || body == null)
             return;
+
+        if (rb == null)
+        {
+            rb = body.GetComponent<Rigidbody>();
+            rb.velocity = Vector3.zero;
+            rb.position = pos;
+        }
 
         if (Input.GetKeyDown(KeyCode.F))
         {
