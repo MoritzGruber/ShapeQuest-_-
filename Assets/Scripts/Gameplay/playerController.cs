@@ -5,6 +5,7 @@ using System.Collections;
 public class playerController : NetworkBehaviour
 {
     public GameObject playerSphere;
+    public GameObject playerCube;
     public float speed = 1;
     public float jumpenergy = 1;
     public float camspeed = 100;
@@ -65,6 +66,31 @@ public class playerController : NetworkBehaviour
         if (!isLocalPlayer || body == null || rb == null)
             return;
 
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            switch (bodyType)
+            {
+                case BodyType.sphere:
+                    {
+                        CmdDestroyBody();
+                        CmdSpawnCube();
+                        bodyType = BodyType.cube;
+                        rb = null;
+                        break;
+                    }
+                case BodyType.cube:
+                    {
+                        CmdDestroyBody();
+                        CmdSpawnSphere();
+                        bodyType = BodyType.sphere;
+                        rb = null;
+                        break;
+                    }
+                default:
+                    break;
+            }
+        }
+
         switch (bodyType)
         {
             case BodyType.sphere:
@@ -90,9 +116,26 @@ public class playerController : NetworkBehaviour
     }
 
     [Command]
+    void CmdDestroyBody()
+    {
+        GameObject obj = gameObject.GetComponent<playerController>().body;
+        NetworkServer.Destroy(obj);
+    }
+
+    [Command]
     void CmdSpawnSphere()
     {
         var obj = (GameObject)Instantiate(playerSphere, transform.position, Quaternion.identity);
+
+        NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
+
+        gameObject.GetComponent<playerController>().body = obj;
+    }
+
+    [Command]
+    void CmdSpawnCube()
+    {
+        var obj = (GameObject)Instantiate(playerCube, transform.position, Quaternion.identity);
 
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
