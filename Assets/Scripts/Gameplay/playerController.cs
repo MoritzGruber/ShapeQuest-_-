@@ -16,6 +16,7 @@ public class playerController : NetworkBehaviour
 
     [SyncVar]
     Vector3 pos;
+    Vector3 velocity;
 
     BodyType bodyType;
     Camera cam;
@@ -36,6 +37,7 @@ public class playerController : NetworkBehaviour
         }
 
         pos = new Vector3();
+        velocity = new Vector3();
 
         CmdSpawnSphere();        
 
@@ -72,8 +74,15 @@ public class playerController : NetworkBehaviour
         if (rb == null)
         {
             rb = body.GetComponent<Rigidbody>();
-            rb.velocity = Vector3.zero;
+            rb.velocity = velocity * 0.5f;
             rb.position = pos;
+        }
+
+        if (transform.position.y < 15)
+        {
+            rb.velocity = Vector3.zero;
+            transform.position = Vector3.zero;
+            return;
         }
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -83,6 +92,7 @@ public class playerController : NetworkBehaviour
                 case BodyType.sphere:
                     {
                         pos = body.transform.position;
+                        velocity = rb.velocity;
                         CmdDestroyBody();
                         CmdSpawnCube();
                         bodyType = BodyType.cube;
@@ -92,6 +102,7 @@ public class playerController : NetworkBehaviour
                 case BodyType.cube:
                     {
                         pos = body.transform.position;
+                        velocity = rb.velocity;
                         CmdDestroyBody();
                         CmdSpawnSphere();
                         bodyType = BodyType.sphere;
