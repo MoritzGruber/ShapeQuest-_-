@@ -87,4 +87,10 @@ public class UIManager : MonoBehaviour {
         playerData.playerColor = playerColor;
 
     }
+
+    public void ExitButton()
+    {
+        Application.Quit();
+    }
+
 }
