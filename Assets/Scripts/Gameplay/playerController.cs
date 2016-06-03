@@ -51,7 +51,7 @@ public class playerController : NetworkBehaviour
 
         playerName = playerData.playerName;
         playerColor = playerData.GetPlayerColor();
-        //CmdSetPlayerData(playerData.playerName, playerData.GetPlayerColor());
+        CmdSetPlayerData(playerData.playerName, playerData.GetPlayerColor());
 
         pos = new Vector3();
         velocity = new Vector3();
@@ -92,6 +92,7 @@ public class playerController : NetworkBehaviour
     void Update()
     {
         OnColorChanged(playerColor);
+        OnNameChanged(playerName);
 
         if (!isLocalPlayer || body == null || rb == null)
             return;
