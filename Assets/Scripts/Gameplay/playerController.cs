@@ -19,6 +19,7 @@ public class playerController : NetworkBehaviour
     Vector3 velocity;
 
     BodyType bodyType;
+    BodyType nextBodyType;
     Camera cam;
 
     enum BodyType
@@ -39,7 +40,9 @@ public class playerController : NetworkBehaviour
         pos = new Vector3();
         velocity = new Vector3();
 
-        CmdSpawnSphere();        
+        CmdSpawnSphere();
+        bodyType = BodyType.sphere;
+        nextBodyType = BodyType.cube;
 
         if (Camera.main != null)
             cam = Camera.main;
@@ -54,6 +57,38 @@ public class playerController : NetworkBehaviour
     {
         if (!isLocalPlayer || body == null || rb == null)
             return;
+
+        //Change shape
+        if (Input.GetKeyDown(KeyCode.F) && bodyType != nextBodyType)
+        {
+            switch (nextBodyType)
+            {
+                case BodyType.cube:
+                    {
+                        pos = body.transform.position + new Vector3(0, 0.3f, 0);
+                        velocity = rb.velocity;
+                        CmdDestroyBody();
+                        CmdSpawnCube();
+                        bodyType = BodyType.cube;
+                        nextBodyType = BodyType.sphere;
+                        rb = null;
+                        return;
+                    }
+                case BodyType.sphere:
+                    {
+                        pos = body.transform.position;
+                        velocity = rb.velocity;
+                        CmdDestroyBody();
+                        CmdSpawnSphere();
+                        bodyType = BodyType.sphere;
+                        nextBodyType = BodyType.cube;
+                        rb = null;
+                        return;
+                    }
+                default:
+                    break;
+            }
+        }
 
         float x = transform.localEulerAngles.x + Input.GetAxis("Mouse Y") * camspeed * Time.deltaTime;
         float y = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * camspeed * Time.deltaTime;
@@ -85,35 +120,7 @@ public class playerController : NetworkBehaviour
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            switch (bodyType)
-            {
-                case BodyType.sphere:
-                    {
-                        pos = body.transform.position;
-                        velocity = rb.velocity;
-                        CmdDestroyBody();
-                        CmdSpawnCube();
-                        bodyType = BodyType.cube;
-                        rb = null;
-                        return;
-                    }
-                case BodyType.cube:
-                    {
-                        pos = body.transform.position;
-                        velocity = rb.velocity;
-                        CmdDestroyBody();
-                        CmdSpawnSphere();
-                        bodyType = BodyType.sphere;
-                        rb = null;
-                        return;
-                    }
-                default:
-                    break;
-            }
-        }
-
+        //Movement Control
         switch (bodyType)
         {
             case BodyType.sphere:
@@ -140,6 +147,8 @@ public class playerController : NetworkBehaviour
         transform.position = body.transform.position;
     }
 
+
+    //spawn Commands
     [Command]
     void CmdDestroyBody()
     {
