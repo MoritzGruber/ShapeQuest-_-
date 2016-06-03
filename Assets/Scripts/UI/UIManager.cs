@@ -10,7 +10,6 @@ public class UIManager : MonoBehaviour {
     public InputField serverIPInput;
     public InputField serverPortInput;
 
-
     public string playerName;
     public string playerColor;
     public string serverIP;
@@ -19,7 +18,21 @@ public class UIManager : MonoBehaviour {
     NetworkManager netMan;
     StorePlayerData playerData;
 
-    // Update is called once per frame
+    void Start()
+    {
+
+        if (playerData == null)
+        {
+            playerData = GameObject.Find("NetworkManager").GetComponent<StorePlayerData>();
+        }
+
+        if (playerData != null)
+        {
+            playerNameInput.text = playerData.playerName;
+            playerColorInput.text = playerData.playerColor;
+        }
+    }
+
     void Update ()
     {
         playerName = playerNameInput.text;
@@ -38,9 +51,7 @@ public class UIManager : MonoBehaviour {
 
     public void JoinButtonClicked()
     {
-        playerData.playerName = playerName;
-        playerData.playerColor = playerColor;
-
+        SetPlayerData();
 
         if (serverIP == "")
         {
@@ -58,8 +69,7 @@ public class UIManager : MonoBehaviour {
 
     public void HostButtonClicked()
     {
-        playerData.playerName = playerName;
-        playerData.playerColor = playerColor;
+        SetPlayerData();
 
         if (serverPort == "")
         {
@@ -71,4 +81,10 @@ public class UIManager : MonoBehaviour {
         netMan.StartHost();
     }
 
+    private void SetPlayerData()
+    {
+        playerData.playerName = playerName;
+        playerData.playerColor = playerColor;
+
+    }
 }

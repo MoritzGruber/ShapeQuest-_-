@@ -12,6 +12,8 @@ public class ButtonPlatformController : MonoBehaviour {
     Vector3 PlatformTargetPos;
     [SerializeField]
     float PlatformMovementTime;
+    //  [SerializeField]
+    //  Transform PlatformTargetTransform;
 
     // Use this for initialization
     void Start ()
@@ -23,7 +25,8 @@ public class ButtonPlatformController : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
-        StartCoroutine(MoveOverSeconds(Platform,PlatformTargetPos,PlatformMovementTime));
+        StartCoroutine(MoveOverSeconds(Platform, PlatformTargetPos, PlatformMovementTime));
+        // StartCoroutine(MoveOverSeconds(Platform, PlatformTargetTransform.position, PlatformMovementTime));
     }
 
     public IEnumerator MoveOverSeconds(GameObject objectToMove, Vector3 end, float seconds)
