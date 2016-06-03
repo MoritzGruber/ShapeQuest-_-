@@ -44,18 +44,19 @@ public class playerController : NetworkBehaviour
             return;
         }
 
+        playerData = GameObject.Find("NetworkManager").GetComponent<StorePlayerData>();
         if (playerData == null)
+        {
+            playerName = "Test";
+            playerColor = Color.red;
+            CmdSetPlayerData("Test", Color.red);
+        }
+        else
         {
             playerData = GameObject.Find("NetworkManager").GetComponent<StorePlayerData>();
             playerName = playerData.playerName;
             playerColor = playerData.GetPlayerColor();
             CmdSetPlayerData(playerData.playerName, playerData.GetPlayerColor());
-        }
-        else
-        {
-            playerName = "Test";
-            playerColor = Color.red;
-            CmdSetPlayerData("Test", Color.red);
         }
 
         playerName = playerData.playerName;
