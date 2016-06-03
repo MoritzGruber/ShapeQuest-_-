@@ -18,13 +18,20 @@ public class StorePlayerData : MonoBehaviour
      */
     public Color GetPlayerColor()
     {
-        byte r = byte.Parse(playerColor.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
-        byte g = byte.Parse(playerColor.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-        byte b = byte.Parse(playerColor.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+        if(playerColor.Length >=6)
+        {
+            byte r = byte.Parse(playerColor.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+            byte g = byte.Parse(playerColor.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+            byte b = byte.Parse(playerColor.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
 
-        Color color = new Color(r, g, b, 255);
+            Color color = new Color(r, g, b, 255);
 
-        return color;
+            return color;
+        }
+        else
+        {
+            return Color.red;
+        }
     }
 
     //TODO: add this on cube shere or stuff creation [in networked player] do so by making a command change color

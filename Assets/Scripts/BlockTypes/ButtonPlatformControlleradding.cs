@@ -37,6 +37,6 @@ public class ButtonPlatformControlleradding : MonoBehaviour {
             yield return new WaitForEndOfFrame();
         }
 		objectToMove.transform.position = (startingPos + end);
-        enabled = false;
+        col.enabled = false;
     }
 }
