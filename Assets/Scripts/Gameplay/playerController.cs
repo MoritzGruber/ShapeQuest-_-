@@ -135,7 +135,7 @@ public class playerController : NetworkBehaviour
             }
         }
 
-        float x = transform.localEulerAngles.x + Input.GetAxis("Mouse Y") * camspeed * Time.deltaTime;
+        float x = transform.localEulerAngles.x - Input.GetAxis("Mouse Y") * camspeed * Time.deltaTime;
         float y = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * camspeed * Time.deltaTime;
         if (x > 60) x = 60;
         else if (x < 15) x = 15;
