@@ -33,5 +33,4 @@ public class StorePlayerData : MonoBehaviour
         Renderer rend = go.GetComponent<Renderer>();
         rend.material.SetColor("_Color", color);
     }
-
 }

@@ -10,6 +10,12 @@ public class playerController : NetworkBehaviour
     public float jumpenergy = 1;
     public float camspeed = 100;
 
+    [SyncVar(hook = "OnColorChanged")]
+    Color playerColor;
+
+    [SyncVar(hook = "OnNameChanged")]
+    string playerName;
+
     [SyncVar]
     GameObject body;
     Rigidbody rb;
@@ -20,6 +26,7 @@ public class playerController : NetworkBehaviour
 
     BodyType bodyType;
     BodyType nextBodyType;
+    StorePlayerData playerData;
     Camera cam;
 
     enum BodyType
@@ -37,6 +44,13 @@ public class playerController : NetworkBehaviour
             return;
         }
 
+        if (playerData == null)
+        {
+            playerData = GameObject.Find("NetworkManager").GetComponent<StorePlayerData>();
+        }
+
+        CmdSetPlayerData(playerData.playerName, playerData.GetPlayerColor());
+
         pos = new Vector3();
         velocity = new Vector3();
 
@@ -51,6 +65,26 @@ public class playerController : NetworkBehaviour
         cam.transform.LookAt(transform);
         cam.transform.SetParent(transform);
         transform.rotation = Quaternion.Euler(25, transform.localEulerAngles.y, transform.localEulerAngles.z);
+    }
+
+    void OnColorChanged(Color color)
+    {
+        if (body == null)
+            return;
+        Renderer rend = body.GetComponent<Renderer>();
+        rend.material.SetColor("_Color", color);
+    }
+
+    void OnNameChanged(string name)
+    {
+        gameObject.name = "Player:" + name;
+    }
+
+    [Command]
+    void CmdSetPlayerData(string name, Color color)
+    {
+        playerName = name;
+        playerColor = color;
     }
 
     void Update()
@@ -147,6 +181,11 @@ public class playerController : NetworkBehaviour
         transform.position = body.transform.position;
     }
 
+    public void SetColorToGameObject(GameObject go, Color color)
+    {
+        Renderer rend = go.GetComponent<Renderer>();
+        rend.material.SetColor("_Color", color);
+    }
 
     //spawn Commands
     [Command]
@@ -164,6 +203,9 @@ public class playerController : NetworkBehaviour
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
         gameObject.GetComponent<playerController>().body = obj;
+        Color c = playerColor;
+        gameObject.GetComponent<playerController>().playerColor = Color.white;
+        gameObject.GetComponent<playerController>().playerColor = c;
     }
 
     [Command]
@@ -174,5 +216,8 @@ public class playerController : NetworkBehaviour
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
         gameObject.GetComponent<playerController>().body = obj;
+        Color c = playerColor;
+        gameObject.GetComponent<playerController>().playerColor = Color.white;
+        gameObject.GetComponent<playerController>().playerColor = c;
     }
 }
