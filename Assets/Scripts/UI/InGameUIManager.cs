@@ -9,7 +9,10 @@ public class InGameUIManager : MonoBehaviour {
 
     NetworkManager netMan;
 
-    // Update is called once per frame
+    /**
+     * <summary>Checks if hit escape and if so tooglels the menus active state
+     *          also if no NetworkManager has ben assinged it assings a NetworkManager given that one exists in the Scene</summary> 
+     */
     void Update ()
     {
 	    if(Input.GetKeyDown(KeyCode.Escape))
@@ -22,12 +25,20 @@ public class InGameUIManager : MonoBehaviour {
         }
     }
 
+    /**
+     * <summary>Called when the Exit button is clicked
+     *          terminates network connections and Closes the Application</summary> 
+     */
     public void ExitButton()
     {
         netMan.StopHost();
         Application.Quit();
     }
 
+    /**
+     * <summary>Called when the Disconnect button is clicked
+     *          Disconnects the Player from the host if the Player is the host it closes the host</summary> 
+     */
     public void DisconnectButton()
     {
         netMan.StopHost();
