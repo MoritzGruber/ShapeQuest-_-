@@ -11,10 +11,10 @@ public class playerController : NetworkBehaviour
     public float camspeed = 100;
 
     [SyncVar(hook = "OnColorChanged")]
-    Color playerColor;
+    public Color playerColor;
 
     [SyncVar(hook = "OnNameChanged")]
-    string playerName;
+    public string playerName;
 
     [SyncVar]
     GameObject body;
@@ -49,7 +49,9 @@ public class playerController : NetworkBehaviour
             playerData = GameObject.Find("NetworkManager").GetComponent<StorePlayerData>();
         }
 
-        CmdSetPlayerData(playerData.playerName, playerData.GetPlayerColor());
+        playerName = playerData.playerName;
+        playerColor = playerData.GetPlayerColor();
+        //CmdSetPlayerData(playerData.playerName, playerData.GetPlayerColor());
 
         pos = new Vector3();
         velocity = new Vector3();
@@ -89,9 +91,10 @@ public class playerController : NetworkBehaviour
 
     void Update()
     {
+        OnColorChanged(playerColor);
+
         if (!isLocalPlayer || body == null || rb == null)
             return;
-        OnColorChanged(playerColor);
 
         //Change shape
         if (Input.GetKeyDown(KeyCode.F) && bodyType != nextBodyType)
