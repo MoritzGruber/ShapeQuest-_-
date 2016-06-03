@@ -40,7 +40,7 @@ public class playerController : NetworkBehaviour
         base.OnStartLocalPlayer();
         if (!isLocalPlayer)
         {
-            enabled = false;
+            //enabled = false;
             return;
         }
 
@@ -91,6 +91,7 @@ public class playerController : NetworkBehaviour
     {
         if (!isLocalPlayer || body == null || rb == null)
             return;
+        OnColorChanged(playerColor);
 
         //Change shape
         if (Input.GetKeyDown(KeyCode.F) && bodyType != nextBodyType)
@@ -202,10 +203,10 @@ public class playerController : NetworkBehaviour
 
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
-        gameObject.GetComponent<playerController>().body = obj;
-        Color c = playerColor;
-        gameObject.GetComponent<playerController>().playerColor = Color.white;
-        gameObject.GetComponent<playerController>().playerColor = c;
+        body = obj;
+        Color c = new Color(playerColor.r,playerColor.g,playerColor.b);
+        playerColor = Color.white;
+        playerColor = c;
     }
 
     [Command]
@@ -215,9 +216,9 @@ public class playerController : NetworkBehaviour
 
         NetworkServer.SpawnWithClientAuthority(obj, connectionToClient);
 
-        gameObject.GetComponent<playerController>().body = obj;
-        Color c = playerColor;
-        gameObject.GetComponent<playerController>().playerColor = Color.white;
-        gameObject.GetComponent<playerController>().playerColor = c;
+        body = obj;
+        Color c = new Color(playerColor.r, playerColor.g, playerColor.b);
+        playerColor = Color.white;
+        playerColor = c;
     }
 }
